@@ -30,9 +30,12 @@ mongoose.connect(process.env.MONGODB_URI, function (err, db) {
 })
 
 //Middlewares
-const parkingsRoute = require("./Routes/ParkingsRoutes.js")
+const ParkAPI = require("./APIs/ParkAPI.js")
+const ParkingRoutes = require("./Routes/ParkingRoutes")
 app.use(bodyParser.json())
-app.use("/parkings", parkingsRoute)
+app.use("/parkings", ParkingRoutes)
+
+
 app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, './Client/client-websocket.html')));
 
