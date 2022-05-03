@@ -1,6 +1,7 @@
 const { type } = require("express/lib/response")
 const  mongoose = require("mongoose")
 
+
 const locationSchema = mongoose.Schema({
     latitude: Number,
     longtitude: Number
@@ -9,10 +10,7 @@ const price_per_hourSchema = mongoose.Schema({
     normal: Number,
     client: Number
 })
-const cars_storedSchema = mongoose.Schema({
-    matricula: String,
-    entrance_date: Number
-})
+const cars_storedSchema = require("./CarModel")
 
 const ParkingSchema = mongoose.Schema({
     name: {
@@ -32,7 +30,7 @@ const ParkingSchema = mongoose.Schema({
         required: true
     },
     cars_stored: {
-        type: [cars_storedSchema]       //Max lenght = capacity
+        type: [cars_storedSchema.CarSchema]       //Max lenght = capacity
     }
     
 

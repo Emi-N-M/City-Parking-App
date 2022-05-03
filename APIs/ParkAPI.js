@@ -1,11 +1,13 @@
 const express = require("express")
 
 const Park = require("../Models/ParkingModel.js")
+const Car = require("../Models/CarModel.js")
 const path = require("path");
 
 //Read all Parkings in DB
 exports.readAllParkings = (async(req, res) => { 
-    res.sendFile(path.join(__dirname, '../Client/client-parkingAPI.html'));
+    const parks = await Park.find()
+    res.send(parks)
 })
 
 //Write new Parking in DB
@@ -31,6 +33,22 @@ exports.findParking = async (req, res) => {
       const parking = await Park.findById(req.params.id);
       res.send({ data: parking });
     } catch {
-      res.status(404).send({ error: "Book is not found!" });
+      res.status(404).send({ error: "Parking is not found!" });
     }
   };
+
+
+  //Add car to parking given _id and Matricula
+  exports.addCar = async (req, res) => {
+    try {
+        const parking = await Park.findById(req.params.id);
+        const newCar = new Car({
+            matricula: req.body.matricula
+        })
+        parking.cars_stored.push(newCar)
+        parking.save();
+        res.send({ data: parking });
+      } catch {
+        res.status(404).send({ error: "Parking is not found!" });
+      }
+  }

@@ -4,6 +4,7 @@ const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
 const fs = require('fs')
+var XMLHttpRequest = require('xhr2');
 const ParkingModel = require("./Models/ParkingModel.js")
 
 require("dotenv").config()
@@ -37,7 +38,7 @@ app.use("/parkings", ParkingRoutes)
 
 
 app.get('/', (req, res) =>
-    res.sendFile(path.join(__dirname, './Client/client-websocket.html')));
+    res.sendFile(path.join(__dirname, './Client/park_API.html')));
 
 
 //HTTP Server
@@ -51,6 +52,8 @@ const WebSocket = require("ws");
 const server = new WebSocket.Server({port: "8080"});
 console.log("WebSocket Server listening on localhost:8080");
 
+
+
 server.on('connection',
     wsClient => {
         console.log("New connection")
@@ -63,6 +66,8 @@ server.on('connection',
                     wsClient.send(JSON.stringify(result))
                 });
             }
+            
+            
         }
 
 

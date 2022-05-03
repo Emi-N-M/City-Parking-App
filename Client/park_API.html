@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parkings</title>
+    <script type="text/javascript">
+        const ws = new WebSocket('ws://localhost:8080');
+        const READ_DB_REQUEST = "READ_PARKING_DB_REQUEST"
+
+       
+
+        
+        let all_parkings_promise = new Promise(function(myResolve, myReject) {
+            let req = new XMLHttpRequest();
+          
+            req.open('GET', `http://localhost:5000/parkings`);
+            req.onload = function() {
+                if (req.status == 200) {
+                myResolve(req.response);
+
+                } else {
+                myReject("Park not Found");
+                }
+            };
+            req.send();
+            });
+            all_parkings_promise.then(
+                
+            function(value) {displayAllParkings(value)},
+            function(error) {console.log(error);}
+            );
+      
+
+
+        function findPark(_id){
+            let single_park_promise = new Promise(function(myResolve, myReject) {
+            let req = new XMLHttpRequest();
+          
+            req.open('GET', `http://localhost:5000/parkings/${_id}`);
+            req.onload = function() {
+                if (req.status == 200) {
+                myResolve(req.response);
+
+                } else {
+                myReject("Park not Found");
+                }
+            };
+            req.send();
+            });
+            single_park_promise.then(
+                
+            function(value) {displaySingleParkInfo(value);},
+            function(error) {displaySingleParkInfo(error);}
+            );
+        }
+
+        function displayAllParkings(parkings) {
+
+            const parking_container = document.getElementById("parking-container") 
+            parkings = JSON.parse(parkings)
+
+            for (let x = 0; x < parkings.length; x++) {
+                const basic_parking_data_map = readBasicInfoPark(parkings[x])
+                 //Create Parking div
+                var parkingDiv = document.createElement("div")          
+                parkingDiv.className = "parking-element_" + x.toString()
+                const park_id = parkings[x]._id.toString()
+      
+                parkingDiv.setAttribute("onclick",`findPark("${park_id}")`)  
+                
+                 //Create textBoxes
+                 parkingDiv.appendChild(document.createElement("p"))
+                        .appendChild(document.createTextNode("Nombre: " + basic_parking_data_map.Name))
+            
+                parkingDiv.appendChild(document.createElement("p"))
+                        .appendChild(document.createTextNode("Sitios Libres: " + basic_parking_data_map.EmptySpaces))
+                //Add Parking div to parking-container div
+                parking_container.appendChild(parkingDiv)
+            }
+
+
+
+        }
+
+        function displaySingleParkInfo(park){
+            const parking_data_map = readAllParkInfo(park)
+            const info_parking_container = document.getElementById(("info-parking-container"))
+  
+            if (info_parking_container.hasChildNodes) {
+                info_parking_container.removeChild(info_parking_container.childNodes[0]);
+            }
+
+            //Create Parking div
+            var parkingDiv = document.createElement("div")          
+            parkingDiv.className = "info-parking-element" 
+            //Create textBoxes
+            parkingDiv.appendChild(document.createElement("p"))
+                    .appendChild(document.createTextNode("Name: " + parking_data_map.Name))
+        
+            parkingDiv.appendChild(document.createElement("p"))
+                    .appendChild(document.createTextNode("Capacity: " + parking_data_map.Capacity))
+
+            parkingDiv.appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Longtitude: " + parking_data_map.Longtitude))
+            parkingDiv.appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Latitude: " + parking_data_map.Latitude))
+            parkingDiv.appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Normal Price: " + parking_data_map.Normal_Price))
+            parkingDiv.appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Client Price: " + parking_data_map.Client_Price))
+
+            //Add Parking div to parking-container div
+
+            info_parking_container.appendChild(parkingDiv)
+        
+            
+        }
+
+     
+
+        function readBasicInfoPark(jsonParking){
+            const name = jsonParking.name
+            const capacity = jsonParking.capacity
+            const nCars = jsonParking.cars_stored.length
+            const emptySpaces = (capacity - nCars)
+            const toret = { "Name": name,
+                            "EmptySpaces": emptySpaces}
+            return toret
+        }
+        
+       
+
+        function readAllParkInfo(park) {
+    
+            park = JSON.parse(park).data
+            const name = park.name
+            const capacity = park.capacity
+            
+            const longtitude = park.location.longtitude
+            const latitude = park.location.latitude
+
+            const normal_price = park.price_per_hour.normal
+            const client_price = park.price_per_hour.client
+
+       
+
+            const toret = { "Name":  name,
+                            "Capacity": capacity,
+                            "Longtitude": longtitude,
+                            "Latitude": latitude,
+                            "Normal_Price": normal_price,
+                            "Client_Price": client_price}
+            return toret
+        }
+
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        html {
+            display: grid;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #EFEFEF;
+            border-bottom: #ba1e29;
+            border-bottom-style: solid;
+            border-bottom-width: 3px;
+            padding-bottom: 15px;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            display: table-cell;
+            vertical-align: middle;
+            border-style: solid;
+            border-width: 3px;
+            border-radius: 5px;
+            border-color: #ba1e29;
+            background-image: linear-gradient(#cb2d3e, #ef473a, #cb2d3e);
+        
+        }
+
+        .parking-container {
+            display: flex;
+            vertical-align: middle;
+            border-bottom: #ba1e29;
+            border-bottom-style: solid;
+            border-bottom-width: 3px;
+            padding: 10px;
+            color: #EFEFEF;
+
+
+        }
+        .parking-container div, .info-parking-element{
+            
+            padding: 10px;
+            border-style: solid;
+            border-width: 2px;
+            border-radius: 5px;
+            margin-top: 8x;
+            margin-left: 8px;
+            font-weight: bold;
+            color: #EFEFEF;
+
+         
+        }
+        .parking-container div:hover {
+            background-image: linear-gradient(#ECE9E6, #ffffff, #ECE9E6);
+            color: #ba1e29;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Listado de Parkings</h1>
+<div class="parking-container" id="parking-container">
+    
+</div>
+    <h1>Info Parking</h1>
+<div class="info-parking-container" id="info-parking-container">
+
+</div>
+
+</body>
+</html>
