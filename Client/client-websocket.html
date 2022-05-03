@@ -4,10 +4,21 @@
     h1 {
         text-align: center;
     }
+    html, body {
+        height: 100%;
+    }
+
+    html {
+        display: table;
+        margin: auto;
+    }
 
     body {
         font-family: Arial, Helvetica, sans-serif;
+        display: table-cell;
+        vertical-align: middle;
     }
+
     .div_container{
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -114,15 +125,6 @@
         console.log(('Message from server: ', data));
     };
 
-    function submit_button() {
-        var matricula_input = document.getElementById("matricula_input").value
-        var parking_input = document.getElementById("parkings").value
-        var submit_input_data = {
-            parking: parking_input,
-            matricula: matricula_input
-        }
-        socket.send(JSON.stringify(submit_input_data))
-    }
 
 
     function select_parking(i) {
@@ -180,7 +182,7 @@
             <option value="Parking D">Parking D</option>
         </select>
         <div class="submit_button">
-            <button onclick="submit_button()">Registrar Salida</button>
+            <button>Registrar Salida</button>
         </div>
     </div>
 </div>

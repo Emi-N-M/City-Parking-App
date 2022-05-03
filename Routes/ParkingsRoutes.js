@@ -1,15 +1,23 @@
 const express = require("express")
 const router = express.Router()
 const ParkingModel = require("../Models/ParkingModel.js")
+const path = require("path");
 
 router.get("/",async(req, res) => { //Read all Parkings in DB
-    try{
-        const posts = await ParkingModel.find()
-        res.json(posts)
-    }catch (err){
-        res.json({msg: err})
-    }
+    res.sendFile(path.join(__dirname, '../Client/client-parkingAPI.html'));
 })
+
+/**
+ * router.get("/",async(req, res) => { //Read all Parkings in DB
+ *     try{
+ *         const posts = await ParkingModel.find()
+ *         res.json(posts)
+ *     }catch (err){
+ *         res.json({msg: err})
+ *     }
+ * })
+ */
+
 
 router.post("/", async(req,res) =>{     //Write new Parking in DB
     const parking = new ParkingModel({
