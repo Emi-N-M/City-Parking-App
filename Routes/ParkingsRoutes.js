@@ -22,7 +22,10 @@ router.get("/",async(req, res) => { //Read all Parkings in DB
 router.post("/", async(req,res) =>{     //Write new Parking in DB
     const parking = new ParkingModel({
         name: req.body.name,
-        capacity: req.body.capacity
+        capacity: req.body.capacity,
+        location: req.body.location,
+        price_per_hour: req.body.price_per_hour,
+        cars_stored: req.body.cars_stored
     })
     try {
         const savedParking = await parking.save()

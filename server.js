@@ -50,13 +50,12 @@ console.log("WebSocket Server listening on localhost:8080");
 
 server.on('connection',
     wsClient => {
-        console.log("New conection")
-
+        console.log("New connection")
         wsClient.onmessage = (event) => {
             // Client request to read all parkings in database
             if (event.data == "READ_PARKING_DB_REQUEST") {
 
-                database.db.collection("parkings").find({}).toArray(function (err, result) {
+                database.db.collection("parkings_2").find({}).toArray(function (err, result) {
                     if (err) throw err;
                     wsClient.send(JSON.stringify(result))
                 });
@@ -66,6 +65,3 @@ server.on('connection',
 
     })
 
-function test() {
-    console.log("funciona?")
-}
