@@ -2,9 +2,9 @@ const { type } = require("express/lib/response")
 const  mongoose = require("mongoose")
 
 const CarSchema = mongoose.Schema({
-    matricula: {
+    _id: {      //Matricula
         type: String,
-        required: true
+        required: true,
     },
     entrance_date:{
         type: Date,

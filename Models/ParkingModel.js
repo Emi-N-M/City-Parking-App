@@ -13,7 +13,7 @@ const price_per_hourSchema = mongoose.Schema({
 const cars_storedSchema = require("./CarModel")
 
 const ParkingSchema = mongoose.Schema({
-    name: {
+    _id: {  //Name of the Parking
         type: String,
         required: true
     },
@@ -38,4 +38,4 @@ const ParkingSchema = mongoose.Schema({
 
 
 
-module.exports = mongoose.model("Parkings_2", ParkingSchema)
+module.exports = mongoose.model("parkings", ParkingSchema)

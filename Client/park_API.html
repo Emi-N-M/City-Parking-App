@@ -86,8 +86,8 @@
             const parking_data_map = readAllParkInfo(park)
             const info_parking_container = document.getElementById(("info-parking-container"))
   
-            if (info_parking_container.hasChildNodes) {
-                info_parking_container.removeChild(info_parking_container.childNodes[0]);
+            while (info_parking_container.firstChild) {
+                info_parking_container.removeChild(info_parking_container.lastChild);
             }
 
             //Create Parking div
@@ -109,17 +109,30 @@
             parkingDiv.appendChild(document.createElement("p"))
             .appendChild(document.createTextNode("Client Price: " + parking_data_map.Client_Price))
 
-            //Add Parking div to parking-container div
+            //Create cars_storaged dov
+            cars_stored_container = document.createElement("div")
+            cars_stored_container.className = "cars-stored-container"
 
+            //Create textBoxes
+            cars_stored_container.appendChild(document.createTextNode("Cars_storaged"))
+            cars_stored = parking_data_map.Cars_Stored
+            for(let x=0; x < cars_stored.length; x++){
+
+            cars_stored_container.appendChild(document.createElement("p"))
+            .appendChild(document.createTextNode("Matrícula: " + cars_stored[x]._id))
+            }
+
+            //Add Parking div and cars_storaged div to parking-container div
             info_parking_container.appendChild(parkingDiv)
-        
+            info_parking_container.appendChild(cars_stored_container)
+
             
         }
 
      
 
         function readBasicInfoPark(jsonParking){
-            const name = jsonParking.name
+            const name = jsonParking._id
             const capacity = jsonParking.capacity
             const nCars = jsonParking.cars_stored.length
             const emptySpaces = (capacity - nCars)
@@ -133,7 +146,7 @@
         function readAllParkInfo(park) {
     
             park = JSON.parse(park).data
-            const name = park.name
+            const name = park._id
             const capacity = park.capacity
             
             const longtitude = park.location.longtitude
@@ -142,14 +155,16 @@
             const normal_price = park.price_per_hour.normal
             const client_price = park.price_per_hour.client
 
-       
+            const cars_stored = park.cars_stored
+            
 
             const toret = { "Name":  name,
                             "Capacity": capacity,
                             "Longtitude": longtitude,
                             "Latitude": latitude,
                             "Normal_Price": normal_price,
-                            "Client_Price": client_price}
+                            "Client_Price": client_price,
+                            "Cars_Stored": cars_stored}
             return toret
         }
 
@@ -195,7 +210,14 @@
 
 
         }
-        .parking-container div, .info-parking-element{
+
+        .info-parking-container{
+            display: flex;
+            vertical-align: middle;
+
+        }
+
+        .parking-container div, .info-parking-element, .cars-stored-container{
             
             padding: 10px;
             border-style: solid;

@@ -6,14 +6,14 @@ const path = require("path");
 
 //Read all Parkings in DB
 exports.readAllParkings = (async(req, res) => { 
-    const parks = await Park.find()
-    res.send(parks)
+    const parkings = await Park.find()
+    res.send(parkings)
 })
 
 //Write new Parking in DB
 exports.addParking = (async(req,res) =>{     
     const parking = new Park({
-        name: req.body.name,
+        _id: req.body._id,
         capacity: req.body.capacity,
         location: req.body.location,
         price_per_hour: req.body.price_per_hour,
@@ -31,6 +31,7 @@ exports.addParking = (async(req,res) =>{
 exports.findParking = async (req, res) => {
     try {
       const parking = await Park.findById(req.params.id);
+      
       res.send({ data: parking });
     } catch {
       res.status(404).send({ error: "Parking is not found!" });
@@ -41,14 +42,34 @@ exports.findParking = async (req, res) => {
   //Add car to parking given _id and Matricula
   exports.addCar = async (req, res) => {
     try {
+      
         const parking = await Park.findById(req.params.id);
+        //console.log("Capacity: ", parking.capacity, " Cars: ", parking.cars_stored.length)
+        //Parking full exception
+        //Car already added exception
         const newCar = new Car({
-            matricula: req.body.matricula
+            _id: req.body._id
         })
         parking.cars_stored.push(newCar)
         parking.save();
         res.send({ data: parking });
-      } catch {
+      } catch(err) {
         res.status(404).send({ error: "Parking is not found!" });
+        console.log("add car error: ", err)
       }
   }
+
+  //Remove car from parking given _id and Matricula
+  exports.removeCar = async (req, res) => {
+    //Car not found exception
+
+      try {
+          const parking = await Park.findByIdAndUpdate(req.params.id,
+            { $pull: { cars_stored:{ _id: req.params.car_id} } }
+          )
+        
+          res.send({ data: parking });
+        } catch {
+          res.status(404).send({ error: "Parking is not found!" });
+        }
+    }
