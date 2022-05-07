@@ -95,7 +95,7 @@ server.on('connection',
                     const body = {
                         _id: data.car_id
                     }
-                    req.open('PATCH', `http://localhost:5000/parkings/${data.parking}`);
+                    req.open('PATCH', `http://localhost:5000/parkings/${data.parking}/add-car`);
                     req.onload = function() {
                         if (req.status == 200) {
                         myResolve(req.response);
@@ -129,7 +129,7 @@ server.on('connection',
                 let remove_car_promise = new Promise(function(myResolve, myReject) {
                 let req = new XMLHttpRequest();
         
-                req.open('PATCH', `http://localhost:5000/parkings/${data.parking}/${data.car_id}`);
+                req.open('PATCH', `http://localhost:5000/parkings/${data.parking}/remove-car/${data.car_id}`);
                 req.onload = function() {
                     if (req.status == 200) {
                     myResolve(req.response);
