@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    h1 {
+        text-align: center;
+            color: #EFEFEF;
+            border-bottom: #ba1e29;
+            border-bottom-style: solid;
+            border-bottom-width: 3px;
+            padding-bottom: 15px;
+    }
+    html, body {
+        height: 100%;
+        
+    }
+
+    html {
+        display: table;
+        margin: auto;
+
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        display: table-cell;
+        vertical-align: middle;
+        border-style: solid;
+        border-width: 3px;
+        border-radius: 5px;
+        border-color: #ba1e29;
+        background-image: linear-gradient(#e02711, #f36513, #e02711);
+    
+    }
+
+    .div_container{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+
+    .entrada_div, .salida_div {
+        overflow: hidden;
+        border-style: solid;
+        border-color: #545454;
+        border-radius: 10px;
+        border-width: 2px;
+        background-color: #EFEFEF;
+        color: #545454;
+        width: fit-content;
+
+    }
+
+    .entrada_div .entrada_div_title, .salida_div .salida_div_title {
+        padding-bottom: 10px;
+        background-color: #3F3FFF;
+        text-align: center;
+    }
+
+    .entrada_div label, .salida_div label {
+        display: inline-block;
+        padding: 0px 40px;
+        font-size: 16px;
+        font-family: inherit;
+        margin-top: 10px;
+        color: black;
+
+    }
+
+    .entrada_div form, .salida_div form {
+        font-size: 16px;
+        border: none;
+        outline: none;
+        padding: 14px 16px;
+        background-color: inherit;
+        font-family: inherit;
+        margin-bottom: 10px;
+    }
+
+    .entrada_div .submit_button, .salida_div .submit_button{
+        font-size: 16px;
+        border-style: solid;
+        border-color: #545454;
+        border-radius: 10px;
+        border-width: 1px;
+        outline: none;
+        margin-left: 55px;
+        background-color: inherit;
+        font-family: inherit;
+        margin-top: 120px;
+        margin-bottom: 10px;
+        width: fit-content;
+        height: fit-content;
+
+    }
+
+    .entrada_div .submit_button button, .salida_div .submit_button button{
+        font-size: 16px;
+        border-style: inherit;
+        border-color: inherit;
+        border-radius: inherit;
+        border-width: inherit;
+        border-color: springgreen;
+        display: block;
+        margin: 0;
+        width: 100%;
+        height: 40px;
+        border: none;
+        outline: none;
+        background-color: #AAFFAA;
+        font-family: inherit;
+    }
+
+    .entrada_div .submit_button button:hover,.salida_div .submit_button button:hover{
+        background-color: #55DD55;
+    }
+  
+    .select {
+        border-style: solid;
+        border-color: #545454;
+        border-radius: 10px;
+        border-width: 1px;
+    }
+
+
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <title>City Car Parking App</title>
+    <h1>Entrada y salida de datos</h1>
+</head>
+<body>
+<script type="text/javascript">
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.addEventListener ("open", e => {
+        //On open send request for parking data
+        socket.send(JSON.stringify(
+            {
+                msg_type: "request"
+            }
+            
+        ))
+        
+    })
+
+    //Listen for messages
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        if(data.msg_type == "reply"){
+            const parkings_array = JSON.parse(data.content)
+            displayParkingNames(getNamesParkings(parkings_array))
+            console.log("reply")
+      
+        }else if(data.msg_type == "operation_result"){
+            alert(data.result)
+            console.log(data.result)
+        }
+    };
+
+
+    //Displaying Parking Names
+    function displayParkingNames (namesParkings_array){
+        const select_parking = document.getElementById("parkings")
+        const exit_select_parking = document.getElementById("exit_parkings")
+
+        console.log(namesParkings_array)
+        for (let x=0; x<namesParkings_array.length; x++){
+
+            option = document.createElement('option');
+            option.setAttribute('value', namesParkings_array[x]);
+            option.innerHTML = namesParkings_array[x] 
+
+            select_parking.appendChild(option);
+            option = document.createElement('option');
+            option.setAttribute('value', namesParkings_array[x]);
+            option.innerHTML = namesParkings_array[x]
+            exit_select_parking.appendChild(option);
+
+        }
+    }
+
+    function getNamesParkings (parkings_array){
+        const namesParkings_array = Array()
+
+        for(let x=0; x < parkings_array.length; x++){
+                namesParkings_array.push(parkings_array[x]._id)
+            }
+        return namesParkings_array
+    }
+
+
+    //Sending Car to store in Parking
+    function sendCar() {
+        const car_id = document.getElementById("matricula_input").value
+        const parking = document.getElementById("parkings").value
+        const msg = {
+                msg_type: "add_car",
+                car_id: car_id,
+                parking: parking
+            }
+        socket.send(JSON.stringify(msg))
+    }
+
+    //Remove car request
+    function removeCar(){
+        const car_id = document.getElementById("salida_matricula_input").value
+        const parking = document.getElementById("exit_parkings").value
+        const msg = {
+                msg_type: "remove_car",
+                car_id: car_id,
+                parking: parking
+            }
+        socket.send(JSON.stringify(msg))
+    }
+
+
+</script>
+
+<div class="div_container">
+    <div class="entrada_div">
+
+        <div class="entrada_div_title">
+            <label style="color: white">Entrada</label>
+        </div>
+
+        <form class="form">
+            <label for="matricula_input">Matricula</label>
+            <input type="text" id="matricula_input" name="matricula"
+                   placeholder="0000XXX"><br>
+        </form>
+
+        <label for="parkings">Escoge el parking: </label>
+
+        <select name="parkings" id="parkings" class="select">
+    
+        </select>
+        <div class="submit_button">
+            <button onclick="sendCar()">Registrar Entrada</button>
+        </div>
+    </div>
+
+    <div class="salida_div">
+
+        <div class="salida_div_title">
+            <label style="color: white">Salida</label>
+        </div>
+
+        <form class="form">
+            <label for="salida_matricula_input">Matricula</label>
+            <input type="text" id="salida_matricula_input" name="matricula"
+                   placeholder="0000XXX"><br>
+        </form>
+
+        <label for="parkings">Escoge el parking: </label>
+
+        <select name="parkings" id="exit_parkings" class="select">
+           
+        </select>
+        <div class="submit_button">
+            <button onclick="removeCar()">Registrar Salida</button>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
