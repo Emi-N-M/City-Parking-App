@@ -1,0 +1,159 @@
+{
+  "info": {
+    "_postman_id": "14aa244a-7365-4db8-baf6-a7c01b1020de",
+    "name": "postman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Mostrar todos os parkings",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/parkings/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Adicionar parking",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n     \"_id\": \"Parking D\",\r\n    \"capacity\": 550,\r\n    \"location\": {\r\n      \"latitude\": 123654,\r\n      \"longtitude\": 456321\r\n    },\r\n    \"price_per_hour\": {\r\n      \"normal\": 3,\r\n      \"client\": 1\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5000/parkings/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Informação de um parking",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/parkings/Parking A",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            "Parking A"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Modificar parking",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{   \r\n    \"price_per_hour\": {\r\n      \"normal\": 5,\r\n      \"client\": 3\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5000/parkings/Parking D",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            "Parking D"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Adicionar carro (entrada)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"_id\": \"1234ADB\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:5000/parkings/Parking D/add-car",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            "Parking D",
+            "add-car"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Apagar carro (saída)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/parkings/Parking B/remove-car/900BBAA",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "parkings",
+            "Parking B",
+            "remove-car",
+            "900BBAA"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
