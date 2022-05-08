@@ -3,8 +3,7 @@ const  mongoose = require("mongoose")
 
 const CarSchema = mongoose.Schema({
     _id: {      //Matricula
-        type: String,
-        required: true,
+        type: String
     },
     entrance_date:{
         type: Date,
