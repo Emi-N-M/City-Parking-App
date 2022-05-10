@@ -35,10 +35,12 @@ mongoose.connect(process.env.MONGODB_URI, {
 })
 
 //Middlewares
-const ParkAPI = require("./APIs/ParkAPI.js")
+
 const ParkingRoutes = require("./Routes/ParkingRoutes")
+const UserRoutes = require("./Routes/UserRoutes")
 app.use(bodyParser.json())
 app.use("/parkings", ParkingRoutes)
+app.use("/users", UserRoutes )
 
 
 app.get('/', (req, res) =>
