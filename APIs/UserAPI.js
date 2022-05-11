@@ -30,6 +30,7 @@ exports.addCarToUser = (async (req, res) => {
         const newCar = req.body.car_id
         const user = await User.findById(req.params.id)
         user.cars_owned.push(newCar)
+        user.save()
         res.send(user)
     }catch (err) {
         res.status(400).send(err)

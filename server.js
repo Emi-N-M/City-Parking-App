@@ -27,7 +27,7 @@ let database
 mongoose.connect(process.env.MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    autoIndex: true, //make this also true
+    autoIndex: true, 
 }, function (err, db) {
     if (err) throw err;
     console.log("Connected to DB")
@@ -51,15 +51,17 @@ app.get('/entrada', (req, res) =>
 
 
 //HTTP Server
-const httpServer = app.listen(5000, 'localhost', () => {
-    console.log('HTTP server is listening on localhost:5000')
+const HTTP_PORT = 5000
+const httpServer = app.listen(HTTP_PORT, 'localhost', () => {
+    console.log(`HTTP server is listening on localhost:${HTTP_PORT}`)
 })
 
 
 //WebSocket Server
+const WS_PORT = 8080
 const WebSocket = require("ws");
 const {json} = require("express/lib/response");
-const server = new WebSocket.Server({port: "8080"});
+const server = new WebSocket.Server({port: WS_PORT});
 console.log("WebSocket Server listening on localhost:8080");
 
 

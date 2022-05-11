@@ -30,9 +30,8 @@ const ParkingSchema = mongoose.Schema({
         required: true
     },
     cars_stored: {
-        type: [cars_storedSchema.CarSchema]       //Max lenght = capacity
+        type: [String]       //Max lenght = capacity
     }
-    
 
 })
 

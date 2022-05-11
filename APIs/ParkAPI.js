@@ -1,7 +1,9 @@
 const express = require("express")
 
 const Park = require("../Models/ParkingModel.js")
+const ParkLog = require("../Models/ParkingLogModel.js")
 const Car = require("../Models/CarModel.js")
+const { Console } = require("console")
 
 
 //Read all Parkings in DB
@@ -47,24 +49,51 @@ exports.addCar = async (req, res) => {
         //Parking full exception
         if (parking.capacity == parking.cars_stored.length) throw "PARKING_IS_FULL_EXCEPTION"
 
-        const newCar = new Car({
-            _id: req.body._id
-        })
-        console.log("includes: ", parking.cars_stored.includes(newCar))
-        console.log("cars_stored : ", parking.cars_stored)
-        console.log("newCar: ", newCar)
-
+        const newCar = req.body.car_id
+       
+  
         //Car already added exception
 
         parking.cars_stored.forEach(function (item) {
-            if (item._id == newCar._id) throw "CAR_ALREADY_ADDED_EXCEPTION"
+            if (item == newCar) throw "CAR_ALREADY_ADDED_EXCEPTION"
         })
 
-
+        //Add car
         parking.cars_stored.push(newCar)
-        parking.save();
+
+        //Register log
+        let parkingLog
+        console.log("parkingLog: ", parkingLog)
+        try {
+            parkingLog = await ParkLog.findOne({parking: req.params.id} )
+            console.log("parkingLog2: ", parkingLog)
+            if (parkingLog == null) throw "PARKING_IS_YET_TO_BE_ADDED_ON_LOGS"
+        } catch (error) {
+            console.log(error)
+            parkingLog = new ParkLog({
+                parking: req.params.id,
+            })      
+        }
+        console.log(1)
+        const log = {
+            entrance_date: Date(),
+            car_id: newCar
+        }
+        console.log("parkingLog: ", parkingLog)
+        console.log("log: ", log)
+        console.log("parkingLog.logs: ", parkingLog.logs)
+        
+        parkingLog.logs.push(log)
+
+        await parking.save();
+
+        await parkingLog.save()
+
+        console.log("Log: ", parkingLog)
+        console.log("parking: ", parking)
         res.send({data: parking});
     } catch (err) {
+        console.log("mis putisimos muertos macho")
         res.status(400).send(err);
     }
 }
