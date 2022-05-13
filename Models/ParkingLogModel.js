@@ -4,12 +4,11 @@ const cars_storedSchema = require("./CarModel");
 
 
 const logSchema = mongoose.Schema({
-    entrance_date:{
-        type: Date
-    },
+    entrance_date: Date,
     exit_date: Date,
     car_id: String,
-    price: Number
+    price: Number,
+    ticket: Number //Unique inside one Parking -> implement restrictions in ParkAPI
 })
 
 const ParkingLogSchema = mongoose.Schema({

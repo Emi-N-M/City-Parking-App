@@ -74,14 +74,20 @@ exports.addCar = async (req, res) => {
                 parking: req.params.id,
             })      
         }
-        console.log(1)
+   
+       
+
+        
+      
+
+        //Generate ticket
+        const ticket = Math.floor(100000 + Math.random() * 900000); //TODO: make it unique
+       
         const log = {
             entrance_date: Date(),
-            car_id: newCar
+            car_id: newCar,
+            ticket: ticket
         }
-        console.log("parkingLog: ", parkingLog)
-        console.log("log: ", log)
-        console.log("parkingLog.logs: ", parkingLog.logs)
         
         parkingLog.logs.push(log)
 
@@ -89,11 +95,9 @@ exports.addCar = async (req, res) => {
 
         await parkingLog.save()
 
-        console.log("Log: ", parkingLog)
-        console.log("parking: ", parking)
+
         res.send({data: parking});
     } catch (err) {
-        console.log("mis putisimos muertos macho")
         res.status(400).send(err);
     }
 }
