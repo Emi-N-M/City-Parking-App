@@ -4,6 +4,7 @@ const Park = require("../Models/ParkingModel.js")
 const ParkLog = require("../Models/ParkingLogModel.js")
 const Car = require("../Models/CarModel.js")
 const { Console } = require("console")
+const { findOne } = require("../Models/CarModel.js")
 
 
 //Read all Parkings in DB
@@ -63,10 +64,9 @@ exports.addCar = async (req, res) => {
 
         //Register log
         let parkingLog
-        console.log("parkingLog: ", parkingLog)
+
         try {
             parkingLog = await ParkLog.findOne({parking: req.params.id} )
-            console.log("parkingLog2: ", parkingLog)
             if (parkingLog == null) throw "PARKING_IS_YET_TO_BE_ADDED_ON_LOGS"
         } catch (error) {
             console.log(error)
@@ -107,14 +107,42 @@ exports.removeCar = async (req, res) => {
 
     try {
         const parking = await Park.findById(req.params.id)
-        //Car not found exception
-        parking.cars_stored.forEach(function (item, index) {
-            if (index == parking.cars_stored.length) throw "CAR_NOT_FOUND_EXCEPTION"
-        })
-        const parkingUpdate = await Park.findByIdAndUpdate(req.params.id,
-            {$pull: {cars_stored: {_id: req.params.car_id}}}
-        )
+       
+        const index = parking.cars_stored.indexOf(req.params.car_id)
+        if (index !== -1) {
+            parking.cars_stored.splice(index, 1);
+           
+        }else {
+        //Car not found exception 
+        throw "CAR_NOT_FOUND_EXCEPTION"
+        }
 
+        //Regist car exit on logs
+        console.log("meeecagoendiosbenditoostiaputayaa")
+        const parkingLog = await ParkLog.findOne({parking: req.params.id})
+        
+        console.log("Parking log: ", parkingLog)    
+        parkingLog.logs.forEach((log, index) => {
+            if(log.car_id == req.params.car_id){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
+                console.log("log: ", log)
+                log.exit_date = Date()
+                //Calculate price
+                const date1 = log.entrance_date
+                const date2 = log.exit_date
+                const hours = Math.abs(date1 - date2) / 36e5;
+                console.log("Horas de parking: ", hours)
+                const pricePaking = parking.price_per_hour.normal
+                console.log("Precio por hora del parking: ", pricePaking)
+                const price = (hours<1)? pricePaking:hours*pricePaking
+                console.log("Precio del estacionamiento: ", price)
+
+                log.price = price
+            }
+        })
+       
+
+        await parkingLog.save()
+        await parking.save()   
         res.send({data: parking});
     } catch (err) {
         res.status(400).send(err);
