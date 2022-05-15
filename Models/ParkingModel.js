@@ -6,11 +6,8 @@ const locationSchema = mongoose.Schema({
     latitude: Number,
     longtitude: Number
 })
-const price_per_hourSchema = mongoose.Schema({
-    normal: Number,
-    client: Number
-})
-const cars_storedSchema = require("./CarModel")
+
+
 
 const ParkingSchema = mongoose.Schema({
     _id: {  //Name of the Parking
@@ -25,10 +22,7 @@ const ParkingSchema = mongoose.Schema({
         type: locationSchema,
         required: true
     },
-    price_per_hour: {
-        type: price_per_hourSchema,
-        required: true
-    },
+    price_per_hour: Number,
     cars_stored: {
         type: [String]       //Max lenght = capacity
     }

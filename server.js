@@ -122,6 +122,7 @@ server.on('connection',
                         function (value) {
                             const msg = {
                                 msg_type: "operation_result",
+                                //TICKET
                                 result: `Se ha añadido el coche ${data.car_id} en el parking ${data.parking}`
                             }
                             wsClient.send(JSON.stringify(msg))

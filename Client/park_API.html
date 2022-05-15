@@ -105,9 +105,8 @@
             parkingDiv.appendChild(document.createElement("p"))
             .appendChild(document.createTextNode("Latitude: " + parking_data_map.Latitude))
             parkingDiv.appendChild(document.createElement("p"))
-            .appendChild(document.createTextNode("Normal Price: " + parking_data_map.Normal_Price))
-            parkingDiv.appendChild(document.createElement("p"))
-            .appendChild(document.createTextNode("Client Price: " + parking_data_map.Client_Price))
+            .appendChild(document.createTextNode("Price: " + parking_data_map.Price))
+            
 
             //Create cars_storaged dov
             cars_stored_container = document.createElement("div")
@@ -152,8 +151,7 @@
             const longtitude = park.location.longtitude
             const latitude = park.location.latitude
 
-            const normal_price = park.price_per_hour.normal
-            const client_price = park.price_per_hour.client
+            const price = park.price_per_hour
 
             const cars_stored = park.cars_stored
             
@@ -162,8 +160,7 @@
                             "Capacity": capacity,
                             "Longtitude": longtitude,
                             "Latitude": latitude,
-                            "Normal_Price": normal_price,
-                            "Client_Price": client_price,
+                            "Price": price,
                             "Cars_Stored": cars_stored}
             return toret
         }

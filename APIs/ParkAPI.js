@@ -2,9 +2,11 @@ const express = require("express")
 
 const Park = require("../Models/ParkingModel.js")
 const ParkLog = require("../Models/ParkingLogModel.js")
-const Car = require("../Models/CarModel.js")
+const UserAPI = require("../APIs/UserAPI.js")
+
 const { Console } = require("console")
 const { findOne } = require("../Models/CarModel.js")
+const res = require("express/lib/response")
 
 
 //Read all Parkings in DB
@@ -74,15 +76,23 @@ exports.addCar = async (req, res) => {
                 parking: req.params.id,
             })      
         }
-   
-       
-
         
       
 
         //Generate ticket
-        const ticket = Math.floor(100000 + Math.random() * 900000); //TODO: make it unique
-       
+        let unique = false
+        while(!unique){
+        let ticket = Math.floor(100000 + Math.random() * 900000); 
+            unique = true
+            parkingLog.logs.forEach((log, index) => {
+                if(log.ticket == ticket){
+                    unique = false
+                    return
+                }
+            })
+        }
+
+
         const log = {
             entrance_date: Date(),
             car_id: newCar,
@@ -96,6 +106,7 @@ exports.addCar = async (req, res) => {
         await parkingLog.save()
 
 
+        //Send ticket too
         res.send({data: parking});
     } catch (err) {
         res.status(400).send(err);
@@ -104,6 +115,58 @@ exports.addCar = async (req, res) => {
 
 //Remove car from parking given _id and Matricula
 exports.removeCar = async (req, res) => {
+
+    try {
+        const parking = await Park.findById(req.params.id)
+       
+        const index = parking.cars_stored.indexOf(req.params.car_id)
+        //Car not found exception 
+        if (index !== -1) {
+            parking.cars_stored.splice(index, 1);
+           
+        }else {
+        throw "CAR_NOT_FOUND_EXCEPTION"
+        }
+
+        //Car is not from user exception
+        if(() => {
+                const users = UserAPI.readAllUsers
+                users.forEach((user, index) =>{
+                        if(user.cars_owned.includes(req.params.car_id)) return false    //Car is from an user
+                    }
+                )
+
+                return true //Car is not found in users collection
+            }){
+            throw "CAR_IS_NOT_FROM_USER"
+        }
+
+        //Regist car exit on logs
+        const parkingLog = await ParkLog.findOne({parking: req.params.id})
+        
+        console.log("Parking log: ", parkingLog) 
+        //For user cars, find only first car log by car_id, starting from the end. 
+        //Otherwise it overwrites the previous logs of the same car
+        parkingLog.logs.forEach((log, i) => {
+            let index = parkingLog.logs.length - i
+            if(parkingLog.logs[index].car_id == req.params.car_id){   
+                parkingLog.logs[index].exit_date = Date()
+                return
+            }
+        })
+       
+
+        await parkingLog.save()
+        await parking.save()   
+        res.send({data: parking});
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+//Remove car by ticket
+
+exports.removeCarByTicket = async (req, res) => {
 
     try {
         const parking = await Park.findById(req.params.id)
@@ -118,12 +181,11 @@ exports.removeCar = async (req, res) => {
         }
 
         //Regist car exit on logs
-        console.log("meeecagoendiosbenditoostiaputayaa")
         const parkingLog = await ParkLog.findOne({parking: req.params.id})
         
         console.log("Parking log: ", parkingLog)    
         parkingLog.logs.forEach((log, index) => {
-            if(log.car_id == req.params.car_id){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
+            if(log.ticket == req.params.ticket){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
                 console.log("log: ", log)
                 log.exit_date = Date()
                 //Calculate price
@@ -131,7 +193,7 @@ exports.removeCar = async (req, res) => {
                 const date2 = log.exit_date
                 const hours = Math.abs(date1 - date2) / 36e5;
                 console.log("Horas de parking: ", hours)
-                const pricePaking = parking.price_per_hour.normal
+                const pricePaking = parking.price_per_hour
                 console.log("Precio por hora del parking: ", pricePaking)
                 const price = (hours<1)? pricePaking:hours*pricePaking
                 console.log("Precio del estacionamiento: ", price)

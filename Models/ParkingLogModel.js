@@ -7,6 +7,7 @@ const logSchema = mongoose.Schema({
     entrance_date: Date,
     exit_date: Date,
     car_id: String,
+    //Price and Ticket only for non-user cars
     price: Number,
     ticket: Number //Unique inside one Parking -> implement restrictions in ParkAPI
 })
