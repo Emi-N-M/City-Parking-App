@@ -52,7 +52,7 @@ exports.addCar = async (req, res) => {
         //Parking full exception
         if (parking.capacity == parking.cars_stored.length) throw "PARKING_IS_FULL_EXCEPTION"
 
-        const newCar = req.body.car_id
+        const newCar = req.params.car_id
        
   
         //Car already added exception
@@ -80,12 +80,12 @@ exports.addCar = async (req, res) => {
       
 
         //Generate ticket
-        let unique = false
+        let unique = false, newTicket = 0
         while(!unique){
-        let ticket = Math.floor(100000 + Math.random() * 900000); 
+        newTicket = Math.floor(100000 + Math.random() * 900000); 
             unique = true
             parkingLog.logs.forEach((log, index) => {
-                if(log.ticket == ticket){
+                if(log.ticket == newTicket){
                     unique = false
                     return
                 }
@@ -96,7 +96,7 @@ exports.addCar = async (req, res) => {
         const log = {
             entrance_date: Date(),
             car_id: newCar,
-            ticket: ticket
+            ticket: newTicket
         }
         
         parkingLog.logs.push(log)
@@ -128,7 +128,8 @@ exports.removeCar = async (req, res) => {
         throw "CAR_NOT_FOUND_EXCEPTION"
         }
 
-        //Car is not from user exception
+        //Check if the car is from an user
+        let fromUser = true
         if(() => {
                 const users = UserAPI.readAllUsers
                 users.forEach((user, index) =>{
@@ -138,23 +139,43 @@ exports.removeCar = async (req, res) => {
 
                 return true //Car is not found in users collection
             }){
-            throw "CAR_IS_NOT_FROM_USER"
+            fromUser = false
         }
 
         //Regist car exit on logs
         const parkingLog = await ParkLog.findOne({parking: req.params.id})
         
-        console.log("Parking log: ", parkingLog) 
-        //For user cars, find only first car log by car_id, starting from the end. 
-        //Otherwise it overwrites the previous logs of the same car
-        parkingLog.logs.forEach((log, i) => {
-            let index = parkingLog.logs.length - i
-            if(parkingLog.logs[index].car_id == req.params.car_id){   
-                parkingLog.logs[index].exit_date = Date()
-                return
-            }
-        })
-       
+        console.log("fromUser: ", fromUser)
+    
+        if(fromUser){
+            //For user cars, find only first car log by car_id, starting from the end. 
+            //Otherwise it overwrites the previous logs of the same car
+            parkingLog.logs.forEach((log, i) => {
+                let index = parkingLog.logs.length - i
+                if(parkingLog.logs[index].car_id == req.params.car_id){   
+                    parkingLog.logs[index].exit_date = Date()
+                    return
+                }
+            })
+
+
+        }else{ 
+            parkingLog.logs.forEach((log, index) => {
+                if(log.ticket == req.body.ticket){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
+                    log.exit_date = Date()
+                    //Calculate price
+                    const date1 = log.entrance_date
+                    const date2 = log.exit_date
+                    const hours = Math.abs(date1 - date2) / 36e5;
+                    console.log("Horas de parking: ", hours)
+                    const pricePaking = parking.price_per_hour
+                    console.log("Precio por hora del parking: ", pricePaking)
+                    const price = (hours<1)? pricePaking:hours*pricePaking
+                    console.log("Precio del estacionamiento: ", price)
+                    log.price = price
+                }
+            })
+        }
 
         await parkingLog.save()
         await parking.save()   

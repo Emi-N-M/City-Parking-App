@@ -5,8 +5,9 @@ const app = express()
 const bodyParser = require("body-parser")
 const fs = require('fs')
 var XMLHttpRequest = require('xhr2');
+const jwt = require('jsonwebtoken')
 const ParkingModel = require("./Models/ParkingModel.js")
-
+app.use(express.json())
 require("dotenv").config()
 
 
@@ -34,6 +35,44 @@ mongoose.connect(process.env.MONGODB_URI, {
     database = db
 })
 
+//AUTH
+
+const passport = require('passport');
+require('/home/emilio/WebstormProjects/city-parking-app/resources/configPassport.js');
+
+app.use(passport.initialize());
+
+//JWT 
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[2]
+    console.log("token: ", token)
+    console.log("ACCESS_TOKEN_SECRET: ", process.env.ACCESS_TOKEN_SECRET)
+    if (token == null) return res.sendStatus(401)
+  
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      console.log(err)
+      if (err) return res.sendStatus(403)
+      req.user = user
+      next()
+    })
+  }
+
+  app.post('/login', (req, res) => {
+    // Authenticate User
+    console.log("mispustisimos mujertyaosd: ", req.body.username)
+    const username = req.body.username
+    const user = { name: username }
+  
+    const accessToken = generateAccessToken(user)
+    res.json({ accessToken: accessToken})
+  })
+
+  function generateAccessToken(user) {
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+  }
+
 //Middlewares
 
 const ParkingRoutes = require("./Routes/ParkingRoutes")
@@ -43,7 +82,7 @@ app.use("/parkings", ParkingRoutes)
 app.use("/users", UserRoutes )
 
 
-app.get('/', (req, res) =>
+app.get('/', authenticateToken, (req, res) =>
     res.sendFile(path.join(__dirname, './Client/park_API.html')));
 
 app.get('/entrada', (req, res) =>
