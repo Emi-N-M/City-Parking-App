@@ -15,5 +15,8 @@ module.exports = function (app) {
     app.route('/:userid')
         .get(userCtrl.get_user);
 
+    app.route('/readAll')
+        .get(userCtrl.read_all_users)
+
 
 }

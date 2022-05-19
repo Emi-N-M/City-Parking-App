@@ -82,7 +82,7 @@ app.use("/parkings", ParkingRoutes)
 app.use("/users", UserRoutes )
 
 
-app.get('/', authenticateToken, (req, res) =>
+app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, './Client/park_API.html')));
 
 app.get('/entrada', (req, res) =>

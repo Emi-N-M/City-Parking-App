@@ -2,7 +2,17 @@
 
 const passport = require('passport')
 const mongoose = require('mongoose')
-const User = mongoose.model("users")
+
+
+//Read all Users in DB
+exports.read_all_users = (async (req, res) => {
+    try{
+    const users = await User.find()
+    res.send(users)
+    }catch(err){
+        res.status(404).send(err)
+    }
+})
 
 exports.sign_up_user = (req, res) => {
     const rb = req.body
