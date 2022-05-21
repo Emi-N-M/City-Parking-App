@@ -34,8 +34,8 @@ exports.addParking = (async (req, res) => {
     }
 })
 
-//Find parking by _id
-exports.findParking = async (req, res) => {
+//Find parking by _id read active parkings
+exports.getParkingInfo = async (req, res) => {
     try {
         const parking = await Park.findById(req.params.id);
         if(!parking) throw "PARKING_NOT_FOUND_EXCEPTION"
@@ -51,6 +51,64 @@ exports.findParking = async (req, res) => {
         }
 
         res.send({parking: parking, activeParkings: activeParkings});
+    } catch(err) {
+        if(err == "PARKING_NOT_FOUND_EXCEPTION") 
+            res.status(404).send(err);
+        else
+            res.status(400).send(err)
+    }
+};
+
+//Find parking by _id read non-active parkings
+exports.getParkingInfo_nonActive = async (req, res) => {
+    try {
+        const parking = await Park.findById(req.params.id);
+        if(!parking) throw "PARKING_NOT_FOUND_EXCEPTION"
+
+        const parkingLog = await ParkLog.findOne({parking: req.params.id})
+  
+        let activeParkings = Array()
+        if(parkingLog){
+            parkingLog.logs.forEach((log, index) => {
+                if(log.exit_date)
+                    activeParkings.push(log)
+            })
+        }
+
+        res.send({parking: parking, activeParkings: activeParkings});
+    } catch(err) {
+        if(err == "PARKING_NOT_FOUND_EXCEPTION") 
+            res.status(404).send(err);
+        else
+            res.status(400).send(err)
+    }
+};
+
+
+//Get the current price of an active parking
+exports.getCurrentPrice = async (req, res) => {
+    try {
+        const parking = await Park.findById(req.params.id);
+        if(!parking) throw "PARKING_NOT_FOUND_EXCEPTION"
+
+        const  pricePaking = parking.price_per_hour
+        const parkingLog = await ParkLog.findOne({parking: req.params.id})
+        let price
+    
+        if(parkingLog){
+            parkingLog.logs.forEach((log, index) => {
+                if(!log.exit_date && log.car_id == req.params.car_i){
+                    const date1 = log.entrance_date
+                    const date2 = log.exit_date
+                    const hours = Math.abs(date1 - date2) / 36e5;
+                    price = (hours<1)? pricePaking:hours*pricePaking
+                }
+                
+            })
+            throw "ACTIVE_PARKING_NOT_FOUND_EXCEPTION"
+        }
+
+        res.send({price: price});
     } catch(err) {
         if(err == "PARKING_NOT_FOUND_EXCEPTION") 
             res.status(404).send(err);

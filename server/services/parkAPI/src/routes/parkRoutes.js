@@ -11,8 +11,14 @@ module.exports = function (app) {
         .post(parkCtrl.addParking);
 
     app.route('/:id')
-        .get(parkCtrl.findParking);
+        .get(parkCtrl.getParkingInfo);
 
+    app.route('/:id/non-active')
+        .get(parkCtrl.getParkingInfo_nonActive)
+
+    app.route('/:id/current-price/:car_id')
+        .get(parkCtrl.getCurrentPrice)    
+    
     app.route('/:id')
         .patch(parkCtrl.modifyParking)
 
