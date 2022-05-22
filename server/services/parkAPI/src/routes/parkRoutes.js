@@ -22,14 +22,11 @@ module.exports = function (app) {
     app.route('/:id')
         .patch(parkCtrl.modifyParking)
 
-    app.route('/:id/add-car/:car_id')
+    app.route('/:id/add-car/:car_id/:user_code')
         .patch(parkCtrl.addCar);
 
     app.route("/:id/remove-car/:car_id")
         .patch(parkCtrl.removeCar);
 
-    
-    app.route('/:id/remove-car-by-ticket/:ticket')
-        .patch(parkCtrl.removeCarByTicket);
-
+   
 }

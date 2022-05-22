@@ -74,3 +74,15 @@ exports.get_user = function (req, res) {
         res.json(user);
     });
 };
+
+exports.addCar = async function (req, res) {
+    try{
+        //TODO: Add car already added exception
+        const user = await User.findById(req.params.userid)
+        user.cars_owned.push(req.params.car_id)
+        await user.save()
+        res.send({user: user})
+    }catch(err){
+        res.status(400).send(err)
+    }
+};

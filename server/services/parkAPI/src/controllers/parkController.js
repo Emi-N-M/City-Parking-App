@@ -67,15 +67,15 @@ exports.getParkingInfo_nonActive = async (req, res) => {
 
         const parkingLog = await ParkLog.findOne({parking: req.params.id})
   
-        let activeParkings = Array()
+        let nonActiveParkings = Array()
         if(parkingLog){
             parkingLog.logs.forEach((log, index) => {
                 if(log.exit_date)
-                    activeParkings.push(log)
+                    nonActiveParkings.push(log)
             })
         }
 
-        res.send({parking: parking, activeParkings: activeParkings});
+        res.send({parking: parking, nonActiveParkings: nonActiveParkings});
     } catch(err) {
         if(err == "PARKING_NOT_FOUND_EXCEPTION") 
             res.status(404).send(err);
@@ -97,15 +97,18 @@ exports.getCurrentPrice = async (req, res) => {
     
         if(parkingLog){
             parkingLog.logs.forEach((log, index) => {
-                if(!log.exit_date && log.car_id == req.params.car_i){
+                if(!log.exit_date && log.car_id == req.params.car_id){
                     const date1 = log.entrance_date
-                    const date2 = log.exit_date
+                    const date2 = Date.now()
                     const hours = Math.abs(date1 - date2) / 36e5;
+                    console.log("hours: ", hours)
                     price = (hours<1)? pricePaking:hours*pricePaking
+                    console.log("date1: ", date1, " date2: ", date2, "priceParking: ", pricePaking)
+
                 }
                 
             })
-            throw "ACTIVE_PARKING_NOT_FOUND_EXCEPTION"
+            //throw "ACTIVE_PARKING_NOT_FOUND_EXCEPTION"
         }
 
         res.send({price: price});
@@ -173,35 +176,49 @@ exports.addCar = async (req, res) => {
                 parking: req.params.id,
             })      
         }
+
         
       
-
-        //Generate ticket
-        let unique = false, newTicket = 0
-        while(!unique){
-        newTicket = Math.floor(100000 + Math.random() * 900000); 
-            unique = true
-            parkingLog.logs.forEach((log, index) => {
-                if(log.ticket == newTicket){
-                    unique = false
-                    return
-                }
-            })
+        //Check if the car belongs to an user
+        let log, newTicket
+        if(req.params.user_code == "no-code"){
+    
+            //Generate ticket
+            let unique = false
+            while(!unique){
+            newTicket = Math.floor(100000 + Math.random() * 900000); 
+                unique = true
+                parkingLog.logs.forEach((log, index) => {
+                    if(log.ticket == newTicket){
+                        unique = false
+                        return
+                    }
+                })
+            }
+            log = {
+                entrance_date: Date(),
+                car_id: newCar,
+                ticket: newTicket
+            }
+        }else{
+            
+ 
+            log = {
+                entrance_date: Date(),
+                car_id: newCar,
+                userCode: req.params.user_code
+            }
         }
 
-
-        const log = {
-            entrance_date: Date(),
-            car_id: newCar,
-            ticket: newTicket
-        }
         
         parkingLog.logs.push(log)
 
         await parking.save();
 
+
         await parkingLog.save()
 
+       
 
         //Send ticket too
         res.send({data: parking, ticket: newTicket});
@@ -229,10 +246,22 @@ exports.removeCar = async (req, res) => {
         //Regist car exit on logs
         const parkingLog = await ParkLog.findOne({parking: req.params.id})
 
-     
+        //Check if car is from user
+        const logId = (req.body.ticket) ? req.body.ticket : req.body.userCode
+        if(!logId) throw "TICKET_OR_USERCODE_REQUIRED"
+
+        console.log("logID: ", logId)
+        let logFound = false
         parkingLog.logs.forEach((log, index) => {
-            if(log.ticket == req.body.ticket){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
+            console.log("log.ticket: ", log.ticket)
+            console.log("log.usercode: ", log.userCode)
+            //ticket and userCode are different data types so only one of the
+            //conditions below is going to happen
+            if(!log.exit_date && (log.ticket == logId || log.userCode == logId) && log.car_id == req.params.car_id){    //It HAS to find the log by the ticket/userCode, NOT the car_id. Otherwise it overwrites the previous logs of the same car
+                logFound = true
                 log.exit_date = Date()
+                console.log("exitdate: ", log.exit_date)
+                console.log("car_id_: ", log.car_id)
                 //Calculate price
                 const date1 = log.entrance_date
                 const date2 = log.exit_date
@@ -246,7 +275,7 @@ exports.removeCar = async (req, res) => {
             }
         })
     
-
+        if(!logFound) throw "PARKING_LOG_NOT_FOUND_EXCEPTION"
         await parkingLog.save()
         await parking.save()   
         res.send({data: parking});
@@ -255,73 +284,3 @@ exports.removeCar = async (req, res) => {
     }
 }
 
-//Remove car by ticket
-
-exports.removeCarByTicket = async (req, res) => {
-
-    try {
-        const parking = await Park.findById(req.params.id)
-       
-        const index = parking.cars_stored.indexOf(req.params.car_id)
-        if (index !== -1) {
-            parking.cars_stored.splice(index, 1);
-           
-        }else {
-        //Car not found exception 
-        throw "CAR_NOT_FOUND_EXCEPTION"
-        }
-
-        //Regist car exit on logs
-        const parkingLog = await ParkLog.findOne({parking: req.params.id})
-        
-        console.log("Parking log: ", parkingLog)    
-        parkingLog.logs.forEach((log, index) => {
-            if(log.ticket == req.params.ticket){    //It HAS to find the log by the ticket, NOT the car_id. Otherwise it overwrites the previous logs of the same car
-                console.log("log: ", log)
-                log.exit_date = Date()
-                //Calculate price
-                const date1 = log.entrance_date
-                const date2 = log.exit_date
-                const hours = Math.abs(date1 - date2) / 36e5;
-                console.log("Horas de parking: ", hours)
-                const pricePaking = parking.price_per_hour
-                console.log("Precio por hora del parking: ", pricePaking)
-                const price = (hours<1)? pricePaking:hours*pricePaking
-                console.log("Precio del estacionamiento: ", price)
-
-                log.price = price
-            }
-        })
-       
-
-        await parkingLog.save()
-        await parking.save()   
-        res.send({data: parking});
-    } catch (err) {
-        res.status(400).send(err);
-    }
-}
-
-async function readAllUsersFromDB() {
-    console.log("yo ya paso macho")
-    let all_users_promise = new Promise(function(myResolve, myReject) {
-        let req = new XMLHttpRequest();
-        console.log("miramira")
-        req.open('GET', `http://localhost:5001/`);
-        req.onload = function() {
-            if (req.status == 200) {
-            myResolve(req.response);
-                console.log("bombonmbom")
-            } else {
-            myReject("Users not Found");
-            console.log("malmalmalmal")
-            }
-        };
-        req.send();
-        });
-        single_park_promise.then(
-            
-        function(value) {console.log("a gas bro");},
-        function(error) {console.log("cagaste");}
-        );
-}

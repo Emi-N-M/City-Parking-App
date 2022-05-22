@@ -1,4 +1,5 @@
-import {parkingUrls} from '../configs/urls.js';
+
+import {parkingUrls, userUrls} from '../configs/urls.js';
 
 import fetch from 'node-fetch';
 
@@ -57,6 +58,23 @@ export class ParkController {
     }
 
 
+    async getOneParkingNonActive(request, response) {
+        const parkingID = request.params.id;
+        const urlParking = `${parkingUrls.getOneParking}${parkingID}/non-active`;
+        console.log(`GET ${urlParking}`)
+        try {
+            const resFetch = await fetch(urlParking,
+                {
+                    method: 'get',
+                    headers: { "Content-type": "application/json" }
+                })
+            const resultado = await resFetch.json();
+            response.status(resFetch.status).jsonp(resultado);
+
+        } catch (err) {
+            response.sendStatus(500);
+        }
+    }
 
     async modifyParking(request, response) {
         const bodySend = JSON.stringify(request.body);
@@ -79,14 +97,36 @@ export class ParkController {
     }
 
     async addCar(request, response) {
-        const bodySend = JSON.stringify(request.body);
-        console.log(`PATCH ${parkingUrls.addCar}${request.params.id}add-car/${request.params.car_id}`)
+        //Check if the car belongs to an user
+        let users
         try {
-            const resFetch = await fetch(`${parkingUrls.addCar}${request.params.id}/add-car/${request.params.car_id}`,
+            console.log(`GET ${userUrls.getAllUsers}`)
+            const resFetch = await fetch( userUrls.getAllUsers ,
+                {
+                    method: 'get',
+                    headers: { "Content-type": "application/json" }
+                })
+            users = await resFetch.json();
+            
+
+        } catch (err) {
+            console.log(err)
+        }
+        let userCode = "no-code"
+        users.forEach(user => {
+            if(user.cars_owned.includes(request.params.car_id)){
+                console.log("user: ", user)
+                userCode = user._id
+            }
+        });
+
+        //Add car to parking
+        console.log(`PATCH ${parkingUrls.addCar}${request.params.id}/add-car/${request.params.car_id}/${userCode}`)
+        try {
+            const resFetch = await fetch(`${parkingUrls.addCar}${request.params.id}/add-car/${request.params.car_id}/${userCode}`,
                 {
                     method: 'patch',
-                    headers: { "Content-type": "application/json" },
-                    body: bodySend
+                    headers: { "Content-type": "application/json" }
                 });
 
             const resultado = await resFetch.json();

@@ -72,4 +72,22 @@ export class UserController {
         }
     }
 
+    async addCar(request, response) {
+        const userID = request.params.id;
+        const car = request.params.car_id
+        const urlUser = `${userUrls.getOneUser}${userID}`
+        try {
+            console.log(`PATCH ${urlUser}/add-car/${car}`)
+            const resFetch = await fetch( `${urlUser}/add-car/${car}` ,
+                {
+                    method: 'patch',
+                    headers: { "Content-type": "application/json" }
+                })
+            const resultado = await resFetch.json();
+            response.status(resFetch.status).jsonp(resultado);
+
+        } catch (err) {
+            response.sendStatus(500);
+        }
+    }
 }

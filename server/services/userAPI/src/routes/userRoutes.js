@@ -17,6 +17,9 @@ module.exports = function (app) {
     app.route('/:userid')
         .get(userCtrl.get_user);
 
+    app.route('/:userid/add-car/:car_id')
+        .patch(userCtrl.addCar)
+
     
 
 
