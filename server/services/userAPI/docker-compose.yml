@@ -1,0 +1,12 @@
+version: '3'
+services:
+  userapi:
+    build: .
+    ports: 
+      - "5001"
+    environment:
+      - PORT=5001
+      - MONGODB_URI=mongodb+srv://userAPI:userAPI@cluster0.zofw9.mongodb.net/City-Parking-App-DB?retryWrites=true&w=majority
+      - ACCESS_TOKEN_SECRET=useraccesstokensecret
+    restart: "no"
+

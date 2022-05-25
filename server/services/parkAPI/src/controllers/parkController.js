@@ -257,6 +257,7 @@ exports.removeCar = async (req, res) => {
             console.log("log.usercode: ", log.userCode)
             //ticket and userCode are different data types so only one of the
             //conditions below is going to happen
+            //(log.ticket == logId || log.userCode == logId)
             if(!log.exit_date && (log.ticket == logId || log.userCode == logId) && log.car_id == req.params.car_id){    //It HAS to find the log by the ticket/userCode, NOT the car_id. Otherwise it overwrites the previous logs of the same car
                 logFound = true
                 log.exit_date = Date()
