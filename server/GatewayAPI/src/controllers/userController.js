@@ -5,8 +5,9 @@ import fetch from 'node-fetch';
 export class UserController {
     async addNewUser(request, response) {
         const bodySend = JSON.stringify(request.body);
+        
         try {
-            console.log(`GET ${userUrls.addNewUser}`)
+            console.log(`POST ${userUrls.addNewUser}`)
             const resFetch = await fetch(userUrls.addNewUser,
                 {
                     method: 'post',
@@ -22,6 +23,7 @@ export class UserController {
 
     async obtainToken(request, response) {
         const bodySend = JSON.stringify(request.body);
+
         try {
             console.log(`POST ${userUrls.obtainToken}`)
             const resFetch = await fetch(userUrls.obtainToken,

@@ -4,60 +4,28 @@
     <meta charset="UTF-8">
     <title>Parkings</title>
     <script type="text/javascript">
-        const ws = new WebSocket('ws://localhost:8080');
+       // const ws = new WebSocket('ws://localhost:8080');
         const READ_DB_REQUEST = "READ_PARKING_DB_REQUEST"
 
        
+       
+        //Get all parkings
+        fetch("http://localhost:3000/parkings")
+            .then(response => response.json())  
+            .then(data => displayAllParkings(data))
+
+
+        //Get single park info
+        function findPark(_id){
+            fetch(`http://localhost:3000/parkings/${_id}`)
+                .then(response => response.json())  
+                .then(data => displaySingleParkInfo(data))
+            }
 
         
-        let all_parkings_promise = new Promise(function(myResolve, myReject) {
-            let req = new XMLHttpRequest();
-          
-            req.open('GET', `http://localhost:5000/parkings`);
-            req.onload = function() {
-                if (req.status == 200) {
-                myResolve(req.response);
-
-                } else {
-                myReject("Park not Found");
-                }
-            };
-            req.send();
-            });
-            all_parkings_promise.then(
-                
-            function(value) {displayAllParkings(value)},
-            function(error) {console.log(error);}
-            );
-      
-
-
-        function findPark(_id){
-            let single_park_promise = new Promise(function(myResolve, myReject) {
-            let req = new XMLHttpRequest();
-          
-            req.open('GET', `http://localhost:5000/parkings/${_id}`);
-            req.onload = function() {
-                if (req.status == 200) {
-                myResolve(req.response);
-
-                } else {
-                myReject("Park not Found");
-                }
-            };
-            req.send();
-            });
-            single_park_promise.then(
-                
-            function(value) {displaySingleParkInfo(value);},
-            function(error) {displaySingleParkInfo(error);}
-            );
-        }
-
         function displayAllParkings(parkings) {
-
             const parking_container = document.getElementById("parking-container") 
-            parkings = JSON.parse(parkings)
+            //parkings = JSON.parse(parkings)
 
             for (let x = 0; x < parkings.length; x++) {
                 const basic_parking_data_map = readBasicInfoPark(parkings[x])
@@ -116,9 +84,8 @@
             cars_stored_container.appendChild(document.createTextNode("Cars_storaged"))
             cars_stored = parking_data_map.Cars_Stored
             for(let x=0; x < cars_stored.length; x++){
-
-            cars_stored_container.appendChild(document.createElement("p"))
-            .appendChild(document.createTextNode("Matrícula: " + cars_stored[x]._id))
+                cars_stored_container.appendChild(document.createElement("p"))
+                .appendChild(document.createTextNode("Matrícula: " + cars_stored[x]))
             }
 
             //Add Parking div and cars_storaged div to parking-container div
@@ -144,16 +111,17 @@
 
         function readAllParkInfo(park) {
     
-            park = JSON.parse(park).data
-            const name = park._id
-            const capacity = park.capacity
-            
-            const longtitude = park.location.longtitude
-            const latitude = park.location.latitude
+            //park = JSON.parse(park).data
+            const name = park.parking._id
+            const capacity = park.parking.capacity
+            console.log("park: ", park)
 
-            const price = park.price_per_hour
+            const longtitude = park.parking.location.longtitude
+            const latitude = park.parking.location.latitude
 
-            const cars_stored = park.cars_stored
+            const price = park.parking.price_per_hour
+
+            const cars_stored = park.parking.cars_stored
             
 
             const toret = { "Name":  name,

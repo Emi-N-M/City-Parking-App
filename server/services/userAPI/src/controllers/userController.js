@@ -16,6 +16,7 @@ exports.read_all_users = (async (req, res) => {
     }
 })
 
+//Register new user
 exports.sign_up_user = (req, res) => {
     const rb = req.body
     const allFields = rb.username && rb.name
@@ -23,7 +24,7 @@ exports.sign_up_user = (req, res) => {
     if (!allFields) {
         return res
                 .status(400)
-                .json({"message" : "all fields must be filled"})
+                .json({"message" : "all fields must be filled: username, name, email, password"})
     }
 
     const user = new User()
@@ -38,11 +39,12 @@ exports.sign_up_user = (req, res) => {
             res.status(404).json(err)
         } else {
             const token = user.getJWT();
-            res.status(201).json(token);
+            res.status(201).json({accessToken: token});
         }
     })
 }
 
+//Login user
 exports.login_user = (req, res) => {
     const rb = req.body
     const allFields = rb.username
@@ -59,7 +61,7 @@ exports.login_user = (req, res) => {
         }
         if (user) {
             const token = user.getJWT();
-            res.status(200).json({token});
+            res.status(200).json({accessToken: token});
         } else {
             res.status(401) 
                 .json(info)
@@ -67,6 +69,7 @@ exports.login_user = (req, res) => {
     })(req, res)
 }
 
+//Get one user info
 exports.get_user = function (req, res) {
     User.findById(req.params.userid, function (err, user) {
         if (err)
@@ -75,6 +78,7 @@ exports.get_user = function (req, res) {
     });
 };
 
+//Add car to user´s owned cars
 exports.addCar = async function (req, res) {
     try{
         //TODO: Add car already added exception

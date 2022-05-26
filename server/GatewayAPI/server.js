@@ -1,10 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-
+import jwt from 'jsonwebtoken'
+import path from 'path';
 
 const PORT = 3000
+import 'dotenv/config'
 
-import indexRouter from './src/routes/index.js'
 const server = express()
 
 server.use(express.json())
@@ -18,18 +19,43 @@ server.use(function(req, res, next) {
   next();
 });
 
-server.use('/', indexRouter)
+import userRouter from './src/routes/user.js'
+import parkRouter from './src/routes/parking.js'
+import authRouter from './src/routes/auth.js'
 
-// error handlers
-//    Catch unauthorised errors
-server.use((err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    res
-        .status(401)
-        .json({"message" : err.name + ": " + err.message});
-  }
+
+server.use('/users', userRouter)
+server.use('/parkings',authenticateToken, parkRouter)
+
+
+//Auth
+server.use('/', authRouter)
+
+//GUI
+server.get('/GUI',(req,res) => {
+  res.sendFile('/home/emilio/WebstormProjects/city-parking-app/Client/login.html');
 });
 
+server.use('/GUI/parking-list',authenticateToken,(req,res) => {
+  res.sendFile('/home/emilio/WebstormProjects/city-parking-app/Client/park_API.html');
+});
+
+
+
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  if (token == null) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err) => {
+    console.log(err)
+    if (err) return res.sendStatus(403)
+    //req.user = user
+    next()
+  })
+
+}
 
 server.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`));
