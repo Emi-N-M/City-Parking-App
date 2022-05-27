@@ -13,6 +13,7 @@ const router = Router();
 router.get('/:id', userController.getOneUser)
 router.get('/', userController.getAllUsers)
 router.patch('/:id/add-car/:car_id', userController.addCar)
+router.get('/:id/has-car/:car_id', userController.hasCar)
 
 
 export default router;

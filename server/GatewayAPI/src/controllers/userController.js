@@ -57,6 +57,27 @@ export class UserController {
         }
     }
 
+    async hasCar(request, response) {
+        const userID = request.params.id;
+        const car_id = request.params.car_id
+        const urlUser = `${userUrls.hasCar}${userID}/has-car/${car_id}`
+        try {
+            console.log(`GET ${urlUser}`)
+            const resFetch = await fetch( urlUser ,
+                {
+                    method: 'get',
+                    headers: { "Content-type": "application/json" }
+                })
+            const resultado = await resFetch.json();
+            response.status(resFetch.status).jsonp(resultado);
+                
+        } catch (err) {
+            
+            response.sendStatus(500);
+        }
+    }
+
+
     async getAllUsers (request, response) {
 
         try {

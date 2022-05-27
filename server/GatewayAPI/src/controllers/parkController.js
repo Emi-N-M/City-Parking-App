@@ -156,4 +156,24 @@ export class ParkController {
         }
     }
 
+    //Get current price of an stored car
+
+    async getCurrentPrice(request, response) {
+        const parkingID = request.params.id;
+        const carID = request.params.car_id
+        const urlParking = `${parkingUrls.currentPrice}${parkingID}/current-price/${carID}`;
+        console.log(`GET ${urlParking}`)
+        try {
+            const resFetch = await fetch(urlParking,
+                {
+                    method: 'get',
+                    headers: { "Content-type": "application/json" }
+                })
+            const resultado = await resFetch.json();
+            response.status(resFetch.status).jsonp(resultado);
+
+        } catch (err) {
+            response.sendStatus(500);
+        }
+    }
 }

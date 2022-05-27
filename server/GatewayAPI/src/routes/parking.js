@@ -15,6 +15,8 @@ router.get('/:id/non-active', parkController.getOneParkingNonActive);
 router.patch('/:id', parkController.modifyParking);
 router.patch('/:id/add-car/:car_id', parkController.addCar);
 router.patch('/:id/remove-car/:car_id', parkController.removeCar);
+router.get('/:id/current-price/:car_id', parkController.getCurrentPrice);
+
 //TODO current price route
 
 

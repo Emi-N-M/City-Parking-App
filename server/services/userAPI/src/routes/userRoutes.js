@@ -20,6 +20,9 @@ module.exports = function (app) {
     app.route('/:userid/add-car/:car_id')
         .patch(userCtrl.addCar)
 
+    app.route('/:userid/has-car/:car_id')
+        .get(userCtrl.hasCar)
+
     
 
 

@@ -24,7 +24,7 @@ import parkRouter from './src/routes/parking.js'
 import authRouter from './src/routes/auth.js'
 
 
-server.use('/users', userRouter)
+server.use('/users',authenticateToken, userRouter)
 server.use('/parkings',authenticateToken, parkRouter)
 
 

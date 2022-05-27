@@ -8,7 +8,8 @@ export const userUrls = {
     addNewUser: `${userBaseUrl}signup/`,
     obtainToken:  `${userBaseUrl}login/`,
     getOneUser: `${userBaseUrl}`,
-    getAllUsers: `${userBaseUrl}readAll`
+    getAllUsers: `${userBaseUrl}readAll`,
+    hasCar: `${userBaseUrl}`
 
 }
 
@@ -19,6 +20,7 @@ export const parkingUrls = {
     getOneParking:`${parkingBaseUrl}`,
     addCar: `${parkingBaseUrl}`,
     removeCar: `${parkingBaseUrl}`,
-    modifyParking: `${parkingBaseUrl}`
+    modifyParking: `${parkingBaseUrl}`,
+    currentPrice:  `${parkingBaseUrl}`
 
 }
