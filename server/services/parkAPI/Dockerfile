@@ -15,4 +15,4 @@ ENV ACCESS_TOKEN_SECRET=parkaccesstokensecret
 
 EXPOSE 5002
 
-CMD npm start
+CMD ["npm", "start"]

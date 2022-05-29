@@ -15,4 +15,4 @@ ENV ACCESS_TOKEN_SECRET=useraccesstokensecret
 
 EXPOSE 5001
 
-CMD npm start
+CMD ["npm", "start"]
