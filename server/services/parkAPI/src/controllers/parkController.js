@@ -53,7 +53,7 @@ exports.getParkingInfo = async (req, res) => {
         res.send({parking: parking, activeParkings: activeParkings});
     } catch(err) {
         if(err == "PARKING_NOT_FOUND_EXCEPTION") 
-            res.status(404).send(err);
+            res.status(404).send({msg: err});
         else
             res.status(400).send({msg: err})
     }

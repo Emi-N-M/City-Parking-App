@@ -1,8 +1,10 @@
 'use strict';
 
 const passport = require('passport')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const e = require('cors');
 const User = mongoose.model("users")
+const UserLog = require("../models/userLogModel")
 
 
 
@@ -100,7 +102,6 @@ exports.hasCar = async function (req,res) {
 //Add car to user´s owned cars
 exports.addCar = async function (req, res) {
     try{
-        //TODO: Add car already added exception
         const user = await User.findById(req.params.userid)
         if(user.cars_owned.includes(req.params.car_id)) throw "CAR_ALREADY_ADDED_EXCEPTION"
         user.cars_owned.push(req.params.car_id)
@@ -110,3 +111,55 @@ exports.addCar = async function (req, res) {
         res.status(400).send({msg: err})
     }
 };
+
+
+//Register entrance user parking log
+exports.registerEntranceParkingLog = async function (req, res) {
+    try{
+        //Find user register log
+        let userLog
+
+        try {
+            userLog = await UserLog.findOne({user: req.params.userid} )
+            if (userLog == null) throw "USER_IS_YET_TO_BE_ADDED_ON_LOGS"
+        } catch (error) {
+            console.log(error)
+            userLog = new UserLog({
+                user: req.params.userid,
+            })      
+        }
+        
+        //Log the entrance
+        const newLog = {
+            entrance_date: Date(),
+            car_id: req.params.car_id
+        }
+        userLog.logs.push(newLog)
+        await userLog.save()    
+    }catch(err){
+        res.status(400).send({msg: err})
+    }
+}
+
+//Register exit user parking log
+exports.registerExitParkingLog = async function (req, res) {
+    try{
+        //Find user register log
+        const userLog = await UserLog.findOne({user: req.params.userid} )
+       
+    
+        //Log the exit
+        userLog.logs.forEach(log => {
+            if (log.car_id == req.params.car_id && !log.exit_date) {
+                log.exit_date = Date()
+                log.price = req.body.price
+                log.hours = req.body.hours,
+                log.parking = req.body.parking
+
+            }
+        });
+        await userLog.save()    
+    }catch(err){
+        res.status(400).send({msg: err})
+    }
+}

@@ -11,6 +11,7 @@ module.exports = function (app) {
 
     app.route('/login')
         .post(userCtrl.login_user);
+
     app.route('/readAll')
         .get(userCtrl.read_all_users)
 
@@ -23,7 +24,11 @@ module.exports = function (app) {
     app.route('/:userid/has-car/:car_id')
         .get(userCtrl.hasCar)
 
+    app.route('/:userid/register-entrance-parking-log/:car_id')
+        .patch(userCtrl.registerEntranceParkingLog)
     
+    app.route('/:userid/register-exit-parking-log/:car_id')
+        .patch(userCtrl.registerExitParkingLog)
 
 
 }

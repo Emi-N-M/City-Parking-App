@@ -9,7 +9,8 @@ export const userUrls = {
     obtainToken:  `${userBaseUrl}login/`,
     getOneUser: `${userBaseUrl}`,
     getAllUsers: `${userBaseUrl}readAll`,
-    hasCar: `${userBaseUrl}`
+    hasCar: `${userBaseUrl}`,
+    registerLogs: `${userBaseUrl}`
 
 }
 
