@@ -53,8 +53,8 @@ UserSchema.methods.validPassword = function(passwordInput) {
 //Generate JWT
 const jwt = require('jsonwebtoken');
 UserSchema.methods.getJWT = function () {
-    const validade = new Date();
-    validade.setDate(validade.getDate() + 7); 
+    //const validade = new Date();
+   // validade.setDate(validade.getDate() + 7);
     return jwt.sign({ 
             _id: this._id, 
             username: this.username,
