@@ -1,3 +1,7 @@
+
+//FIRST SERVER WITH WEBSOCKETS  --  NOT WORKING
+
+
 const path = require("path")
 const mongoose = require('mongoose');
 const express = require("express")

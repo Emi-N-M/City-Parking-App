@@ -9,10 +9,9 @@ RUN npm install --only=production
 
 COPY ./src ./src
 
-ENV PORT=5001 
-ENV MONGODB_URI=mongodb+srv://userAPI:userAPI@cluster0.zofw9.mongodb.net/City-Parking-App-DB?retryWrites=true&w=majority
+ENV PORT=3000
 ENV ACCESS_TOKEN_SECRET=useraccesstokensecret
 
-EXPOSE 5001
+EXPOSE 3000
 
 CMD ["npm", "start"]

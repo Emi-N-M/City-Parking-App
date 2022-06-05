@@ -10,7 +10,7 @@ RUN npm install --only=production
 COPY ./src ./src
 
 ENV PORT=5002 
-ENV MONGODB_URI=mongodb+srv://parkAPI:parkAPI@cluster0.zofw9.mongodb.net/City-Parking-App-DB?retryWrites=true&w=majority
+ENV MONGODB_URI=mongodb://0.0.0.0:27017/city-parking-app
 ENV ACCESS_TOKEN_SECRET=parkaccesstokensecret
 
 EXPOSE 5002
